@@ -7,7 +7,7 @@
     android:background="#333"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".TodayActivity">
+    tools:context=".GoalActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -17,7 +17,7 @@
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-    
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,9 +26,9 @@
             android:text="Stats"
             android:layout_marginRight="10dp"
             android:clickable="true"
-            android:onClick="switchActivity"
             />
-        
+
+
     </android.support.v7.widget.Toolbar>
 
     <TextView
@@ -36,19 +36,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textColor="#fa0"
-        android:text="Coding activity"
+        android:text="Goals"
         android:id="@+id/coding_title" />
 
-    <Spinner
-        android:id="@+id/dropdown"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/btn_dropdown"
-        android:spinnerMode="dropdown"/>
-
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pieChart_today"
-        android:layout_width="250dp"
-        android:layout_height="250dp" />
 </LinearLayout>

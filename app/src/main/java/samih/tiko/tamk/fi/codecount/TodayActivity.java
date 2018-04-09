@@ -1,9 +1,11 @@
 package samih.tiko.tamk.fi.codecount;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -47,6 +49,12 @@ public class TodayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_today);
 
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        myToolbar.setBackgroundColor(Color.rgb(88,88,88));
+        setSupportActionBar(myToolbar);
+
+
         title = (TextView) findViewById(R.id.coding_title);
 
         //Dropdown
@@ -80,8 +88,6 @@ public class TodayActivity extends AppCompatActivity {
             }
         });
 
-
-        setTitle("moiiii");
 
         //Create pie chart
         pieChart = (PieChart) findViewById(R.id.pieChart_today);
@@ -173,6 +179,10 @@ public class TodayActivity extends AppCompatActivity {
         pieChart.invalidate();
     }
 
+    public void switchActivity(View view){
+        Intent intent = new Intent(this, GoalActivity.class);
+        startActivity(intent);
+    }
 
     class WakatimeStatsTask extends AsyncTask<Void, Void, String> {
 
