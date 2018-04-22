@@ -4,11 +4,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,12 +32,13 @@ import java.util.ArrayList;
 import samih.tiko.tamk.fi.codecount.goal.GoalActivity;
 import samih.tiko.tamk.fi.codecount.R;
 import samih.tiko.tamk.fi.codecount.stat.TodayActivity;
-import samih.tiko.tamk.fi.codecount.Login.Token;
+import samih.tiko.tamk.fi.codecount.login.Token;
 
 public class LeaderboardActivity extends AppCompatActivity {
 
     private ListView leaderboard;
     public static Bitmap[] profilePics = new Bitmap[100];
+    private static boolean activityRunning = false;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,23 +46,58 @@ public class LeaderboardActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.setBackgroundColor(Color.rgb(88,88,88));
         setSupportActionBar(myToolbar);
+        Drawable drawable = myToolbar.getOverflowIcon();
+        if(drawable != null) {
+            drawable = DrawableCompat.wrap(drawable);
+            DrawableCompat.setTint(drawable.mutate(), Color.WHITE);
+            myToolbar.setOverflowIcon(drawable);
+        }
+
 
 
         leaderboard = findViewById(R.id.leaderboard);
+        TextView emptyView = new TextView(this);
+        emptyView.setText("Loading..");
+        leaderboard.setEmptyView(emptyView);
 
         new WakatimeLeaderboardTask(this).execute();
     }
 
-    public void switchActivity(View view){
-        TextView textView = (TextView) view;
+    @Override
+    public void onStart(){
+        super.onStart();
+        activityRunning = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        activityRunning = false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent = null;
-        System.out.println(textView.getText().toString());
-        if(textView.getText().toString().equals("Stats")) {
-            intent = new Intent(this, TodayActivity.class);
-        }else if(textView.getText().toString().equals("Goals")){
-            intent = new Intent(this, GoalActivity.class);
+        switch(item.getTitle().toString()){
+            case "stats":
+                intent = new Intent(this, TodayActivity.class);
+                break;
+            case "leaderboard":
+                intent = new Intent(this, LeaderboardActivity.class);
+                break;
+            case "goals":
+                intent = new Intent(this, GoalActivity.class);
+                break;
         }
-        //startActivity(intent);
+        startActivity(intent);
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.top_menu, menu);
+        return true;
     }
 
     class WakatimeLeaderboardTask extends AsyncTask<Void, Void, String> {
@@ -112,13 +152,18 @@ public class LeaderboardActivity extends AppCompatActivity {
                 JSONArray data = jsonObj.getJSONArray("data");
                 ArrayList<LeaderboardDataUnit> listData = new ArrayList<>();
                 LeaderboardAdapter adapter = new LeaderboardAdapter(listData, activity);
+                String[] imgUrls = new String[data.length()];
+
                 for (int i = 0; i < data.length(); i++) {
 
                     adapter.add(new LeaderboardDataUnit(
                             data.getJSONObject(i).getString("rank"),
                             data.getJSONObject(i).getJSONObject("user").getString("display_name"),
                             data.getJSONObject(i).getJSONObject("running_total").getString("human_readable_total")));
-                    new DownloadImageTask(i, adapter).execute(data.getJSONObject(i).getJSONObject("user").getString("photo"));
+
+                    imgUrls[i] = data.getJSONObject(i).getJSONObject("user").getString("photo");
+                    if(profilePics[i] == null)
+                        new DownloadImageTask(i, adapter).execute(data.getJSONObject(i).getJSONObject("user").getString("photo"));
                 }
 
                 leaderboard.setAdapter(adapter);
@@ -141,12 +186,14 @@ public class LeaderboardActivity extends AppCompatActivity {
         protected Bitmap doInBackground(String... urls) {
             String urldisplay = urls[0];
             Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
+            if(activityRunning) {
+                try {
+                    InputStream in = new java.net.URL(urldisplay).openStream();
+                    mIcon11 = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                    e.printStackTrace();
+                }
             }
             return mIcon11;
         }

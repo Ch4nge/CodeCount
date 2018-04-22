@@ -1,4 +1,4 @@
-package samih.tiko.tamk.fi.codecount.Login;
+package samih.tiko.tamk.fi.codecount.login;
 
 public class Token {
 

@@ -2,10 +2,15 @@ package samih.tiko.tamk.fi.codecount.goal;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CombinedChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -23,6 +29,7 @@ import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,11 +40,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import samih.tiko.tamk.fi.codecount.R;
 import samih.tiko.tamk.fi.codecount.stat.TodayActivity;
-import samih.tiko.tamk.fi.codecount.Login.Token;
+import samih.tiko.tamk.fi.codecount.login.Token;
 import samih.tiko.tamk.fi.codecount.util.Util;
 import samih.tiko.tamk.fi.codecount.leaderboard.LeaderboardActivity;
 
@@ -46,6 +56,8 @@ public class GoalActivity extends AppCompatActivity {
     private CombinedChart chart;
     private CombinedData data;
     private Spinner dropdown;
+    private XAxis xAxis;
+
 
     private boolean asyncTaskRunning = true;
     private boolean isUserInteracting;
@@ -59,15 +71,24 @@ public class GoalActivity extends AppCompatActivity {
         myToolbar.setBackgroundColor(Color.rgb(88,88,88));
         setSupportActionBar(myToolbar);
 
+        Drawable drawable = myToolbar.getOverflowIcon();
+        if(drawable != null) {
+            drawable = DrawableCompat.wrap(drawable);
+            DrawableCompat.setTint(drawable.mutate(), Color.WHITE);
+            myToolbar.setOverflowIcon(drawable);
+        }
+
         chart = (CombinedChart) findViewById(R.id.goals_chart);
         chart.setPinchZoom(false);
         chart.setDoubleTapToZoomEnabled(false);
         chart.setNoDataText("Loading...");
+        chart.setDescription(null);
+        chart.setScaleEnabled(false);
 
         Legend l = chart.getLegend();
         l.setTextColor(Color.WHITE);
 
-        XAxis xAxis = chart.getXAxis();
+        xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setAxisMinimum(0);
         xAxis.setTextColor(Color.WHITE);
@@ -101,16 +122,29 @@ public class GoalActivity extends AppCompatActivity {
         isUserInteracting = true;
     }
 
-    public void switchActivity(View view){
-        TextView textView = (TextView) view;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent = null;
-        System.out.println(textView.getText().toString());
-        if(textView.getText().toString().equals("Stats")) {
-            intent = new Intent(this, TodayActivity.class);
-        }else if(textView.getText().toString().equals("Leaderboards")){
-            intent = new Intent(this, LeaderboardActivity.class);
+        switch(item.getTitle().toString()){
+            case "stats":
+                intent = new Intent(this, TodayActivity.class);
+                break;
+            case "leaderboard":
+                intent = new Intent(this, LeaderboardActivity.class);
+                break;
+            case "goals":
+                intent = new Intent(this, GoalActivity.class);
+                break;
         }
         startActivity(intent);
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.top_menu, menu);
+        return true;
     }
 
 
@@ -151,17 +185,33 @@ public class GoalActivity extends AppCompatActivity {
 
         ArrayList<BarEntry> entries1 = new ArrayList<>();
 
+        String[] dates = new String[chart_data.length()];
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         for (int i = 0; i < chart_data.length(); i++) {
             try {
-                System.out.println(chart_data.length());
-                System.out.println(chart_data.getJSONObject(i).getInt("actual_seconds"));
                 entries1.add(new BarEntry(i, (float)chart_data.getJSONObject(i).getInt("actual_seconds")/60/60));
-            }catch(JSONException e){
+                Date date = sdf.parse(chart_data.getJSONObject(i).getJSONObject("range").getString("date"));
+                System.out.println(date);
+                String dayOfTheWeek = (String) DateFormat.format("EEE", date);
+
+                dates[i] = dayOfTheWeek;
+
+
+                System.out.println(dates[i]);
+            }catch(Exception e){
                 e.printStackTrace();
             }
         }
 
+        final String[] tempDates = dates;
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return tempDates[(int) value];
+            }
+        });
 
         BarDataSet set1 = new BarDataSet(entries1, "Daily activity");
         set1.setColor(Color.parseColor("#0c94ee"));

@@ -5,12 +5,16 @@
     <item
         android:id="@+id/stats_item"
         android:title="stats"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/goals_item"
         android:title="goals"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/leaderboard_item"
+        android:title="leaderboard"
+        app:showAsAction="never"/>
 
 </menu>
