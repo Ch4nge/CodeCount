@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".LoginActivity"
+        <activity android:name=".Login.LoginActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,8 +29,9 @@
 
             </intent-filter>
         </activity>
-        <activity android:name=".TodayActivity" />
-        <activity android:name=".GoalActivity" />
+        <activity android:name=".stat.TodayActivity" />
+        <activity android:name=".goal.GoalActivity" />
+        <activity android:name=".leaderboard.LeaderboardActivity" />
     </application>
 
 </manifest>

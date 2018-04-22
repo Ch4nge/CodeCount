@@ -7,13 +7,16 @@
     android:background="#333"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".GoalActivity">
+    tools:context=".goal.GoalActivity">
+
+
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
+        app:titleTextColor="#fff"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
@@ -22,12 +25,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
+            android:textColor="#fff"
             android:layout_gravity="right"
-            android:text="Stats"
+            android:text="Leaderboards"
+            android:onClick="switchActivity"
             android:layout_marginRight="10dp"
             android:clickable="true"
             />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="#fff"
+            android:layout_gravity="right"
+            android:text="Stats"
+            android:onClick="switchActivity"
+            android:layout_marginRight="10dp"
+            android:clickable="true"
+            />
 
     </android.support.v7.widget.Toolbar>
 
@@ -38,5 +54,16 @@
         android:textColor="#fa0"
         android:text="Goals"
         android:id="@+id/coding_title" />
+    <Spinner
+        android:id="@+id/goalDropdown"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown"/>
+
+    <com.github.mikephil.charting.charts.CombinedChart
+        android:id="@+id/goals_chart"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" />
 
 </LinearLayout>

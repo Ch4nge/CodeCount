@@ -1,4 +1,4 @@
-package samih.tiko.tamk.fi.codecount;
+package samih.tiko.tamk.fi.codecount.Login;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +10,9 @@ import android.view.View;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import samih.tiko.tamk.fi.codecount.R;
+import samih.tiko.tamk.fi.codecount.stat.TodayActivity;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -51,10 +54,8 @@ public class LoginActivity extends AppCompatActivity {
         long expireTime = prefs.getLong("expires", 0);
         String refreshToken = prefs.getString("refreshToken", null);
 
-        System.out.println("ASD: "+expireTime + " DATE: "+ new Date().getTime());
         if (token != null && expireTime != 0 && refreshToken != null && new Date().getTime() < expireTime) {
             Intent intent = new Intent(this, TodayActivity.class);
-            System.out.println("start intent");
             startActivity(intent);
         }
     }
@@ -64,8 +65,6 @@ public class LoginActivity extends AppCompatActivity {
 
         if (data != null && data.getScheme().equals("codecount") && data.getFragment() != null) {
             Token token = parseUrl(data.getFragment());
-
-            System.out.println("get access token"+token.getAccessToken());
 
             if (token.getAccessToken() != null && token.getRefreshToken() != null && token.getExpireTime() != 0) {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -91,14 +90,11 @@ public class LoginActivity extends AppCompatActivity {
 
             if (urlContent[0].equals("access_token")) {
                 token.setAccessToken(urlContent[1]);
-
             } else if (urlContent[0].equals("refresh_token")) {
                 token.setRefreshToken(urlContent[1]);
             } else if (urlContent[0].equals("expires_in")) {
                 String expiryString = urlContent[1];
                 token.setExpireTime(getExpireDate(expiryString));
-                System.out.println("EXPIRY DATE FOR NOW: " + new Date(token.getExpireTime()));
-
             }
         }
         return token;
@@ -108,8 +104,5 @@ public class LoginActivity extends AppCompatActivity {
         long expiresInMillis = TimeUnit.SECONDS.toMillis(Long.parseLong(expireDate));
         return expiresInMillis + new Date().getTime();
     }
-
-
-
 
 }

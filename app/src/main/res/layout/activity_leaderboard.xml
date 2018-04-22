@@ -7,18 +7,32 @@
     android:background="#333"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".stat.TodayActivity">
+    tools:context=".goal.GoalActivity">
+
+
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:elevation="4dp"
         app:titleTextColor="#fff"
+        android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-    
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="#fff"
+            android:layout_gravity="right"
+            android:text="Goals"
+            android:onClick="switchActivity"
+            android:layout_marginRight="10dp"
+            android:clickable="true"
+            />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,11 +40,11 @@
             android:textColor="#fff"
             android:layout_gravity="right"
             android:text="Stats"
+            android:onClick="switchActivity"
             android:layout_marginRight="10dp"
             android:clickable="true"
-            android:onClick="switchActivity"
             />
-        
+
     </android.support.v7.widget.Toolbar>
 
     <TextView
@@ -38,19 +52,15 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textColor="#fa0"
-        android:text="Coding activity"
+        android:text="Leaderboards"
         android:id="@+id/coding_title" />
 
-    <Spinner
-        android:id="@+id/dropdown"
+    <ListView
+        android:id="@+id/leaderboard"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/btn_dropdown"
-        android:spinnerMode="dropdown"/>
+        android:layout_height="match_parent"
+        android:divider="#a80"
+        android:dividerHeight="4px"
+        />
 
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pieChart_today"
-        android:layout_width="250dp"
-        android:layout_height="250dp" />
 </LinearLayout>

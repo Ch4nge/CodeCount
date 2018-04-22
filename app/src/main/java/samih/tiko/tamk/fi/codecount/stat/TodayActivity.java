@@ -1,4 +1,4 @@
-package samih.tiko.tamk.fi.codecount;
+package samih.tiko.tamk.fi.codecount.stat;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -30,6 +30,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+
+import samih.tiko.tamk.fi.codecount.Login.Token;
+import samih.tiko.tamk.fi.codecount.R;
+import samih.tiko.tamk.fi.codecount.goal.GoalActivity;
 
 public class TodayActivity extends AppCompatActivity {
 
@@ -65,7 +69,6 @@ public class TodayActivity extends AppCompatActivity {
         dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("VALINTA: "+position);
                 switch (position) {
                     case 0:
                         selectedItem = WEEK;
@@ -97,6 +100,7 @@ public class TodayActivity extends AppCompatActivity {
         pieChart.setCenterTextColor(Color.WHITE);
         pieChart.setCenterTextSize(15f);
         pieChart.getDescription().setEnabled(false);
+
         Legend l = pieChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
@@ -136,9 +140,10 @@ public class TodayActivity extends AppCompatActivity {
             entries.add(entry);
         }
         PieDataSet dataSet = new PieDataSet(entries, "");
+
         dataSet.setDrawIcons(false);
 
-        dataSet.setSliceSpace(3f);
+        dataSet.setSliceSpace(0f);
         dataSet.setIconsOffset(new MPPointF(0, 40));
         dataSet.setSelectionShift(5f);
 
@@ -164,6 +169,8 @@ public class TodayActivity extends AppCompatActivity {
         dataSet.setColors(colors);
 
         PieData data = new PieData(dataSet);
+
+
 
         data.setValueTextSize(14f);
         data.setValueTextColor(Color.DKGRAY);
@@ -191,10 +198,11 @@ public class TodayActivity extends AppCompatActivity {
         protected void onPreExecute() {
             asyncTaskRunning = true;
             pieChart.clear();
+            dropdown.setEnabled(false);
         }
 
         protected String doInBackground(Void... urls) {
-            System.out.println("TOKENI: " +Token.accessToken);
+            System.out.println("TOKENI: " + Token.accessToken);
             URL url = null;
 
             try {
@@ -234,19 +242,26 @@ public class TodayActivity extends AppCompatActivity {
 
         protected void onPostExecute(String response) {
             if(response == null) {
-                response = "THERE WAS AN ERROR";
+                response = "ERROR";
             }
             try {
                 JSONObject jsonObj = (JSONObject) new JSONTokener(response).nextValue();
                 JSONObject data = jsonObj.getJSONObject("data");
-                JSONArray languages = data.getJSONArray("languages");
-
-                setData(languages);
-                pieChart.setCenterText(data.getString("human_readable_total"));
+                JSONArray languages = null;
+                if(data.getBoolean("is_up_to_date"))
+                    languages = data.getJSONArray("languages");
+                if(languages != null) {
+                    setData(languages);
+                    pieChart.setCenterText(data.getString("human_readable_total"));
+                }else{
+                    System.out.println(jsonObj.getString("message"));
+                    pieChart.setNoDataText(jsonObj.getString("message"));
+                }
             } catch (JSONException e){
                 e.printStackTrace();
             }
             asyncTaskRunning = false;
+            dropdown.setEnabled(true);
             System.out.println(response);
         }
     }
