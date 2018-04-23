@@ -12,11 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -46,7 +43,7 @@ import samih.tiko.tamk.fi.codecount.goal.GoalActivity;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
 
-public class TodayActivity extends AppCompatActivity{
+public class StatsActivity extends AppCompatActivity{
 
     private final int WEEK = 0;
     private final int MONTH = 1;
@@ -154,7 +151,7 @@ public class TodayActivity extends AppCompatActivity{
         Intent intent = null;
         switch(item.getTitle().toString()){
             case "stats":
-                intent = new Intent(this, TodayActivity.class);
+                intent = new Intent(this, StatsActivity.class);
                 break;
             case "leaderboard":
                 intent = new Intent(this, LeaderboardActivity.class);

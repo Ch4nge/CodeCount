@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -40,29 +39,55 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 import samih.tiko.tamk.fi.codecount.R;
-import samih.tiko.tamk.fi.codecount.stat.TodayActivity;
+import samih.tiko.tamk.fi.codecount.stat.StatsActivity;
 import samih.tiko.tamk.fi.codecount.login.Token;
 import samih.tiko.tamk.fi.codecount.util.Util;
 import samih.tiko.tamk.fi.codecount.leaderboard.LeaderboardActivity;
 
+/**
+ * Activity that holds users Wakatime Goals in chart
+ */
 public class GoalActivity extends AppCompatActivity {
 
+    /**
+     * Chart that holds users goal data
+     */
     private CombinedChart chart;
+    /**
+     * Charts data
+     */
     private CombinedData data;
-    private Spinner dropdown;
+    /**
+     * xAxis of chart, defined to set custom values to axis
+     */
     private XAxis xAxis;
+    /**
+     * Dropdown menu where use can change goal
+     */
+    private Spinner dropdown;
 
-
+    /**
+     * is Async task running or not
+     */
     private boolean asyncTaskRunning = true;
+    /**
+     * is user interacting with activity
+     */
     private boolean isUserInteracting;
+    /**
+     * selected goal that is shown in chart(used in switch case)
+     */
     private int selectedGoal = 0;
 
+    /**
+     * Gets data and sets it to UI
+     * @param savedInstanceState savedInstanceState
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goal);
@@ -116,18 +141,26 @@ public class GoalActivity extends AppCompatActivity {
         new WakatimeGoalsTask(this).execute();
     }
 
+    /**
+     * sets isUserInteraction to true when user interacts with app
+     */
     @Override
     public void onUserInteraction(){
         super.onUserInteraction();
         isUserInteracting = true;
     }
 
+    /**
+     * Called when user selects MenuItem, changes activity depenting on select
+     * @param item MenuItem that is selected
+     * @return true
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent = null;
         switch(item.getTitle().toString()){
             case "stats":
-                intent = new Intent(this, TodayActivity.class);
+                intent = new Intent(this, StatsActivity.class);
                 break;
             case "leaderboard":
                 intent = new Intent(this, LeaderboardActivity.class);
@@ -140,6 +173,11 @@ public class GoalActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Gets menu layout from R.menu.top_menu
+     * @param menu Menu
+     * @return true
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -148,6 +186,11 @@ public class GoalActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Sets line data to combinet chart
+     * @param chart_data JSONArray where data is fetched
+     * @return LineData for chart
+     */
     private LineData setLineData(JSONArray chart_data) {
 
         LineData d = new LineData();
@@ -179,6 +222,11 @@ public class GoalActivity extends AppCompatActivity {
         return d;
     }
 
+    /**
+     * Sets BarData of combined chart
+     * @param chart_data JSONArray where data is fetched
+     * @return BarData for chart
+     */
     private BarData setBarData(JSONArray chart_data) {
 
         BarData d = new BarData();
@@ -226,18 +274,26 @@ public class GoalActivity extends AppCompatActivity {
     }
 
 
-
-
+    /**
+     * AsynchTask that gets data from wakatime, and sets them in chart
+     */
     class WakatimeGoalsTask extends AsyncTask<Void, Void, String> {
 
         private Exception exception;
         private GoalActivity activity;
 
+        /**
+         * constructor
+         * @param activity current activity
+         */
         public WakatimeGoalsTask(GoalActivity activity){
             this.activity = activity;
         }
 
 
+        /**
+         * On AsyncTask start, inits chart and disables dropdown
+         */
         protected void onPreExecute() {
             dropdown.setEnabled(false);
             asyncTaskRunning = true;
@@ -245,6 +301,11 @@ public class GoalActivity extends AppCompatActivity {
             chart.invalidate();
         }
 
+        /**
+         * Gets data from given url
+         * @param urls url where data is taken
+         * @return JSON data as String
+         */
         protected String doInBackground(Void... urls) {
             System.out.println("TOKENI: " + Token.accessToken);
 
@@ -274,6 +335,11 @@ public class GoalActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         * Turns string data into JSONData, takes needed data and sets it to chart.
+         * enables dropdown.
+         * @param response Response from doInBackground
+         */
         protected void onPostExecute(String response) {
             if(response == null) {
                 response = "ERROR";

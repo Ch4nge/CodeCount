@@ -7,7 +7,7 @@
     android:background="#333"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".stat.TodayActivity">
+    tools:context=".stat.StatsActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"

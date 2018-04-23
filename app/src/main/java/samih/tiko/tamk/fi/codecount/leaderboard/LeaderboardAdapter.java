@@ -17,13 +17,27 @@ import java.util.ArrayList;
 
 import samih.tiko.tamk.fi.codecount.R;
 
+/**
+ * Adapter for Leaderboards ListView
+ */
 public class LeaderboardAdapter extends ArrayAdapter<LeaderboardDataUnit> {
 
 
+    /**
+     * List of data needed for updating ListView
+     */
     private ArrayList<LeaderboardDataUnit> dataSet;
 
+    /**
+     * Context
+     */
     private Context mContext;
 
+    /**
+     * Constructor that inits data
+     * @param data Array of LeaderboardDataUnits
+     * @param context context
+     */
     public LeaderboardAdapter(ArrayList<LeaderboardDataUnit> data, Context context) {
         super(context, R.layout.list_item, data);
         this.dataSet = data;
@@ -31,6 +45,9 @@ public class LeaderboardAdapter extends ArrayAdapter<LeaderboardDataUnit> {
     }
 
     @Override
+    /**
+     * Sets single View in list
+     */
     public View getView(int position, View view, ViewGroup parent) {
 
         final ViewHolder holder;
@@ -64,6 +81,9 @@ public class LeaderboardAdapter extends ArrayAdapter<LeaderboardDataUnit> {
         return view;
     }
 
+    /**
+     * Helper class that holds information of single item of ListView
+     */
     private class ViewHolder{
         TextView holderRank;
         ImageView holderImage;

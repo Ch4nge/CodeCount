@@ -13,7 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,15 +30,31 @@ import java.util.ArrayList;
 
 import samih.tiko.tamk.fi.codecount.goal.GoalActivity;
 import samih.tiko.tamk.fi.codecount.R;
-import samih.tiko.tamk.fi.codecount.stat.TodayActivity;
+import samih.tiko.tamk.fi.codecount.stat.StatsActivity;
 import samih.tiko.tamk.fi.codecount.login.Token;
 
+/**
+ * Activity that holds ListView with data of wakatimes Leaderboards
+ */
 public class LeaderboardActivity extends AppCompatActivity {
 
+    /**
+     * Listview where data is held
+     */
     private ListView leaderboard;
+    /**
+     * Array for leaderboards profile pictures
+     */
     public static Bitmap[] profilePics = new Bitmap[100];
+    /**
+     * is activity running or not
+     */
     private static boolean activityRunning = false;
 
+    /**
+     * Inits needed classes and starts async task
+     * @param savedInstanceState savedInstanceState
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
@@ -63,24 +78,35 @@ public class LeaderboardActivity extends AppCompatActivity {
         new WakatimeLeaderboardTask(this).execute();
     }
 
+    /**
+     * Sets activityRunning to true
+     */
     @Override
     public void onStart(){
         super.onStart();
         activityRunning = true;
     }
 
+    /**
+     * sets activityRunning to false
+     */
     @Override
     public void onStop() {
         super.onStop();
         activityRunning = false;
     }
 
+    /**
+     * Called when user selects MenuItem, changes activity depenting on select
+     * @param item MenuItem that is selected
+     * @return true
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent = null;
         switch(item.getTitle().toString()){
             case "stats":
-                intent = new Intent(this, TodayActivity.class);
+                intent = new Intent(this, StatsActivity.class);
                 break;
             case "leaderboard":
                 intent = new Intent(this, LeaderboardActivity.class);
@@ -93,6 +119,11 @@ public class LeaderboardActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Gets menu layout from R.menu.top_menu
+     * @param menu Menu
+     * @return true
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -100,11 +131,20 @@ public class LeaderboardActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Async task that gets leaderboard data from WakaTime and sets them to chart
+     */
     class WakatimeLeaderboardTask extends AsyncTask<Void, Void, String> {
 
+        /**
+         * Current activity
+         */
         private LeaderboardActivity activity;
-        private Exception exception;
 
+        /**
+         * Constructor that inits activity
+         * @param activity current activity
+         */
         public WakatimeLeaderboardTask(LeaderboardActivity activity) {
             this.activity = activity;
         }
@@ -113,6 +153,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         }
 
+        /**
+         * Gets leaderboard data from url and returns it
+         * @param urls url where leaderboard data is taken
+         * @return JSON data as String
+         */
         protected String doInBackground(Void... urls) {
             URL url = null;
 
@@ -143,6 +188,11 @@ public class LeaderboardActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         * Uses doInBacgrounds String data, turns it into JSON, gets needed data and set
+         * it to chart
+         * @param response
+         */
         protected void onPostExecute(String response) {
             if(response == null) {
                 response = "ERROR";
@@ -174,15 +224,34 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Async task used to download images from url and set them into profilePics array
+     */
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        /**
+         * Index where in array image is set
+         */
         int index;
+        /**
+         * Leaderboard's adapter to notify data changes
+         */
         LeaderboardAdapter adapter;
 
+        /**
+         * constructor that inits adapter and index
+         * @param index index of image array
+         * @param adapter adapter of leaderboard
+         */
         public DownloadImageTask(int index, LeaderboardAdapter adapter) {
             this.index = index;
             this.adapter = adapter;
         }
 
+        /**
+         * Gets image from url and returns it
+         * @param urls url where image is taken
+         * @return image
+         */
         protected Bitmap doInBackground(String... urls) {
             String urldisplay = urls[0];
             Bitmap mIcon11 = null;
@@ -198,6 +267,10 @@ public class LeaderboardActivity extends AppCompatActivity {
             return mIcon11;
         }
 
+        /**
+         * sets image to profilePics and notifies adapter for data changes
+         * @param result
+         */
         protected void onPostExecute(Bitmap result) {
             profilePics[index] = result;
             if(index <= leaderboard.getLastVisiblePosition() && index >= leaderboard.getFirstVisiblePosition()){

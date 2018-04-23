@@ -29,7 +29,7 @@
 
             </intent-filter>
         </activity>
-        <activity android:name=".stat.TodayActivity" />
+        <activity android:name=".stat.StatsActivity" />
         <activity android:name=".goal.GoalActivity" />
         <activity android:name=".leaderboard.LeaderboardActivity" />
     </application>

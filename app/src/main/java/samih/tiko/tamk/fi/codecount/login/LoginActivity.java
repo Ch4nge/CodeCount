@@ -12,11 +12,17 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import samih.tiko.tamk.fi.codecount.R;
-import samih.tiko.tamk.fi.codecount.stat.TodayActivity;
+import samih.tiko.tamk.fi.codecount.stat.StatsActivity;
 
-
+/**
+ * Activity where user can log in
+ */
 public class LoginActivity extends AppCompatActivity {
 
+    /**
+     * inits activity and calls getWakaTimeData() and checkToken()
+     * @param savedInstanceState SavedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +32,11 @@ public class LoginActivity extends AppCompatActivity {
         checkToken();
     }
 
+    /**
+     * Opens browser and makes api call to wakatime. Redirects back to app with
+     * token data when done.
+     * @param view Log in button
+     */
     public void signIn(View view){
         String id = "FAQJtnVpD4yAn87UMkcGMoOQ";
         String uri = "codecount://login";
@@ -45,6 +56,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * checks if we have valid token, logs in if we do
+     */
     private void checkToken() {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -55,11 +69,14 @@ public class LoginActivity extends AppCompatActivity {
         String refreshToken = prefs.getString("refreshToken", null);
 
         if (token != null && expireTime != 0 && refreshToken != null && new Date().getTime() < expireTime) {
-            Intent intent = new Intent(this, TodayActivity.class);
+            Intent intent = new Intent(this, StatsActivity.class);
             startActivity(intent);
         }
     }
 
+    /**
+     * Gets wakatime data from intents data and sets it to shared preferences.
+     */
     private void getWakatimeData() {
         Uri data = this.getIntent().getData();
 
@@ -73,13 +90,18 @@ public class LoginActivity extends AppCompatActivity {
                 prefs.edit().putLong("expires", token.getExpireTime()).apply();
 
                 Token.setCheckRefreshToken(false);
-                Intent intent = new Intent(this, TodayActivity.class);
+                Intent intent = new Intent(this, StatsActivity.class);
                 startActivity(intent);
             }
         }
     }
 
 
+    /**
+     * Parses url and gets new Token from it
+     * @param url url where token is taken
+     * @return new Token
+     */
     public static Token parseUrl(String url) {
         Token token = new Token();
 
@@ -100,9 +122,14 @@ public class LoginActivity extends AppCompatActivity {
         return token;
     }
 
+    /**
+     * Gets exact expiration time of token
+     * @param expireDate expire date of token
+     * @return expiretime in milliseconds
+     */
     public static long getExpireDate(String expireDate) {
-        long expiresInMillis = TimeUnit.SECONDS.toMillis(Long.parseLong(expireDate));
-        return expiresInMillis + new Date().getTime();
+        long expires = TimeUnit.SECONDS.toMillis(Long.parseLong(expireDate));
+        return expires + new Date().getTime();
     }
 
 }
