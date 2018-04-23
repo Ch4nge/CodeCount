@@ -310,7 +310,7 @@ public class GoalActivity extends AppCompatActivity {
             System.out.println("TOKENI: " + Token.accessToken);
 
             try {
-                URL url = new URL(Util.apiUrl+"/users/current/goals");
+                URL url = new URL("https://wakatime.com/api/v1/users/current/goals");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setRequestProperty("Authorization", "Bearer "+ Token.accessToken);

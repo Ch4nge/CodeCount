@@ -45,22 +45,62 @@ import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
 
 public class StatsActivity extends AppCompatActivity{
 
+    /**
+     * integer that refers to week
+     */
     private final int WEEK = 0;
+    /**
+     * integer that refers to month
+     */
     private final int MONTH = 1;
+    /**
+     * integer that refers to year
+     */
     private final int YEAR = 2;
 
+    /**
+     * selectedItem that tells what data should be fetched, uses WEEK, MONTH and YEAR
+     */
     private int selectedItem = 0;
+    /**
+     * Tells if async task is running or not
+     */
     private boolean asyncTaskRunning = true;
 
+    /**
+     * Sort data by this value, can be editors, projects or languages
+     */
     private String sorting = "languages";
 
+    /**
+     * Pie Chart where data is shown
+     */
     private PieChart pieChart;
+    /**
+     * Json object that contains data of pie chart
+     */
     private JSONObject data;
+    /**
+     * object that contains potential errors and messages from wakatime
+     */
     private JSONObject jsonObj;
+    /**
+     * radio buttons for time ranges
+     */
     private RadioGroup timeRanges;
+    /**
+     * radio buttons for sorting data
+     */
     private RadioGroup sortby;
+    /**
+     * Title textview
+     */
     private TextView title;
 
+    /**
+     * inits chart, gets data and sets it to chart.
+     * @param savedInstanceState savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +152,11 @@ public class StatsActivity extends AppCompatActivity{
         new WakatimeStatsTask().execute();
     }
 
+    /**
+     * changes selected item and starts async task.
+     * called when timerange radiobutton is selected
+     * @param view radiobutton
+     */
     public void changeTimeRange(View view){
         switch (view.getId()) {
             case R.id.week:
@@ -129,6 +174,10 @@ public class StatsActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Changes sorting and re-sets piecharts data, called when sorting radiobutton is selected
+     * @param view radiobutton
+     */
     public void changeSorting(View view){
         switch(view.getId()){
             case R.id.languages:
@@ -146,6 +195,11 @@ public class StatsActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Navigation
+     * @param item selected item
+     * @return true
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent = null;
@@ -164,6 +218,11 @@ public class StatsActivity extends AppCompatActivity{
         return true;
     }
 
+    /**
+     * Gets menu layout from R.menu.top_menu
+     * @param menu Menu
+     * @return true
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -171,12 +230,19 @@ public class StatsActivity extends AppCompatActivity{
         return true;
     }
 
+    /**
+     * Starts async process, if it is not running
+     */
     private void startAsynchProcess(){
         if(!asyncTaskRunning){
             new WakatimeStatsTask().execute();
         }
     }
 
+    /**
+     * Gets data from JSONArray and sets it to piechart
+     * @param sortedData array where data is taken
+     */
     private void setData(JSONArray sortedData) {
 
         ArrayList<PieEntry> entries = new ArrayList<>();
@@ -238,6 +304,9 @@ public class StatsActivity extends AppCompatActivity{
         pieChart.invalidate();
     }
 
+    /**
+     * Called from async task, sets data to piedata depending on response
+     */
     public void setPieData(){
         try {
             JSONArray sortedData = null;
@@ -254,6 +323,10 @@ public class StatsActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Sets radiobutton enabled or diabled
+     * @param enabled boolean value of enabled
+     */
     private void setRadioEnabled(boolean enabled){
         for (int i = 0; i < sortby.getChildCount(); i++) {
             sortby.getChildAt(i).setEnabled(enabled);
@@ -263,16 +336,26 @@ public class StatsActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Async task that gets data from wakatime and sets it to
+     * pieChart
+     */
     class WakatimeStatsTask extends AsyncTask<Void, Void, String> {
 
-        private Exception exception;
-
+        /**
+         * sets radiobuttons disabled and clears piechart data on task start
+         */
         protected void onPreExecute() {
             asyncTaskRunning = true;
             pieChart.clear();
             setRadioEnabled(false);
         }
 
+        /**
+         * gets data from url and returns JSON as String
+         * @param urls url where data is gotten
+         * @return JSON as string
+         */
         protected String doInBackground(Void... urls) {
             Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
             System.out.println("TOKENI: " + Token.accessToken);
@@ -313,6 +396,10 @@ public class StatsActivity extends AppCompatActivity{
             }
         }
 
+        /**
+         * Turns response into JSONObject, gets data from it and sets it to pieChart
+         * @param response JSON data as a string.
+         */
         protected void onPostExecute(String response) {
             if(response == null) {
                 response = "ERROR";
